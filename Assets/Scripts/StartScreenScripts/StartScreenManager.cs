@@ -30,8 +30,8 @@ public class StartScreenManager : MonoBehaviour
             return;
         }
 
-        PersistantDataManager.CurrentPlayer = name;
-        PersistantDataManager.CurrentScore = 0;
+        PersistentDataManager.CurrentPlayer = name;
+        PersistentDataManager.CurrentScore = 0;
         errorMessage.SetText("");
     }
 

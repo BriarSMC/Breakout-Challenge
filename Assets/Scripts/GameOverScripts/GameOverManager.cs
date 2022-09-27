@@ -6,17 +6,17 @@ using TMPro;
 
 public class GameOverManager : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI[] highScores = new TextMeshProUGUI[PersistantDataManager.MAXHIGHSCORE];
-    [SerializeField] List<PersistantDataManager.HighScore> HighScores;
+    [SerializeField] TextMeshProUGUI[] highScores = new TextMeshProUGUI[PersistentDataManager.MAXHIGHSCORE];
+    [SerializeField] List<PersistentDataManager.HighScore> HighScores;
 
     public void StartNewGame()
     {
-        SceneManager.LoadScene(PersistantDataManager.SCENEGAME);
+        SceneManager.LoadScene(PersistentDataManager.SCENEGAME);
     }
 
     public void ChangePlayer()
     {
-        SceneManager.LoadScene(PersistantDataManager.SCENEMENU);
+        SceneManager.LoadScene(PersistentDataManager.SCENEMENU);
     }
 
     public void Exit()
@@ -40,7 +40,7 @@ public class GameOverManager : MonoBehaviour
             highScores[i].SetText("");
         }
 
-        HighScores = PersistantDataManager.HighScores;
+        HighScores = PersistentDataManager.HighScores;
 
         for(int i = 0; i < HighScores.Count; i++)
         {

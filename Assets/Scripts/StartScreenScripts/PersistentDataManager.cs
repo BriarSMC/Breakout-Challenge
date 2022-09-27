@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-public class PersistantDataManager : MonoBehaviour
+public class PersistentDataManager : MonoBehaviour
 {
     /*
      * We are going to retain the last five (5) high scores in a list
      * and store/load it in a list.
      */
 
-    public static PersistantDataManager Instance;
+    public static PersistentDataManager Instance;
 
     private string saveFilePath = Application.persistentDataPath + "/highscores.json";
 
-    public static string CurrentPlayer; 
+    public static string CurrentPlayer;
     public static int CurrentScore;
 
     public const int MAXHIGHSCORE = 5;
@@ -29,7 +29,7 @@ public class PersistantDataManager : MonoBehaviour
          * Tell Unity not to trash us on scene unload
          * Load high scores from storage
          */
-        if(Instance != null)
+        if (Instance != null)
         {
             Destroy(gameObject);
             return;
@@ -63,35 +63,36 @@ public class PersistantDataManager : MonoBehaviour
          *   
          * Then write that sucker out.
          */
-        
+
         // Create current player/score pair
         HighScore highScore = new HighScore();
         highScore.playerName = CurrentPlayer;
         highScore.score = CurrentScore;
-              
+
         // If the list is empty, then add it as the only element.
-        if(HighScores.Count == 0)
+        if (HighScores.Count == 0)
         {
             HighScores.Add(highScore);
-        } else
+        }
+        else
         // Otherwise, insert it where it goes
         {
-            for(i = 0; i < HighScores.Count; i++)
+            for (i = 0; i < HighScores.Count; i++)
             {
-                if(highScore.score > HighScores[i].score)
+                if (highScore.score > HighScores[i].score)
                 {
                     HighScores.Insert(i, highScore);
                     break;
                 }
             }
-            if(i >= MAXHIGHSCORE)
+            if (i >= MAXHIGHSCORE)
             {
                 HighScores.Add(highScore);
             }
         }
 
         // Trim the list to the maximum size
-        if(HighScores.Count > MAXHIGHSCORE)
+        if (HighScores.Count > MAXHIGHSCORE)
         {
             HighScores.RemoveAt(MAXHIGHSCORE);
         }
@@ -104,7 +105,7 @@ public class PersistantDataManager : MonoBehaviour
     public void LoadHighScores()
     {
 
-        if(File.Exists(saveFilePath))
+        if (File.Exists(saveFilePath))
         {
             string json = File.ReadAllText(saveFilePath);
             HighScores = JsonUtility.FromJson<List<HighScore>>(json);
