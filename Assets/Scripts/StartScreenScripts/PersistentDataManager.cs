@@ -91,8 +91,18 @@ public class PersistentDataManager : MonoBehaviour
             {
                 if (CurrentScore > highScores.highScoresList[i].score)
                 {
-                    highScores.highScoresList.Insert(i, highScore);
-                    done = true;
+                    if(i > 0)
+                    {
+                        if(CurrentScore != highScores.highScoresList[i - 1].score)
+                        {
+                            highScores.highScoresList.Insert(i, highScore);
+                            done = true;
+                        }
+                    } else
+                    {
+                        highScores.highScoresList.Insert(i, highScore);
+                        done = true;
+                    }
                 }
                 i++;
             }
