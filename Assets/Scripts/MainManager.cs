@@ -10,6 +10,7 @@ public class MainManager : MonoBehaviour
     public int LineCount = 6;
     public Rigidbody Ball;
 
+    public Text highScoreText;
     public Text ScoreText;
     public GameObject GameOverText;
     
@@ -36,6 +37,9 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        highScoreText.text = "High Score: " + PersistentDataManager.CurrentPlayer + 
+            ": " + PersistentDataManager.sessionHighScore;
     }
 
     private void Update()
@@ -55,10 +59,12 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            }
+            //if (Input.GetKeyDown(KeyCode.Space))
+            //{
+            //    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            //}
+
+            SceneManager.LoadScene(PersistentDataManager.SCENEGAMEOVER, LoadSceneMode.Single);
         }
     }
 
@@ -71,6 +77,8 @@ public class MainManager : MonoBehaviour
     public void GameOver()
     {
         m_GameOver = true;
-        GameOverText.SetActive(true);
+        PersistentDataManager.SetScores(m_Points);
+        PersistentDataManager.SaveHighScores();
+        //GameOverText.SetActive(true);
     }
 }

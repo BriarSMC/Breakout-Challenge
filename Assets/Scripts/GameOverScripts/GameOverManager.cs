@@ -7,16 +7,17 @@ using TMPro;
 public class GameOverManager : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI[] highScores = new TextMeshProUGUI[PersistentDataManager.MAXHIGHSCORE];
-    [SerializeField] List<PersistentDataManager.HighScore> HighScores;
+    //[SerializeField] List<PersistentDataManager.HighScore> HighScores;
 
     public void StartNewGame()
     {
-        SceneManager.LoadScene(PersistentDataManager.SCENEGAME);
+        SceneManager.LoadScene(PersistentDataManager.SCENEGAME, LoadSceneMode.Single);
     }
 
     public void ChangePlayer()
     {
-        SceneManager.LoadScene(PersistentDataManager.SCENEMENU);
+        PersistentDataManager.sessionHighScore = 0;
+        SceneManager.LoadScene(PersistentDataManager.SCENEMENU, LoadSceneMode.Single);
     }
 
     public void Exit()
@@ -30,21 +31,17 @@ public class GameOverManager : MonoBehaviour
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode) 
-    { 
-        /*
-         * This is where we load up the high scores
-         */
-
+    {
         for(int i = 0; i < highScores.Length; i++)
         {
             highScores[i].SetText("");
         }
 
-        HighScores = PersistentDataManager.HighScores;
+        List<string> list = PersistentDataManager.GetFormattedHighScoresList();
 
-        for(int i = 0; i < HighScores.Count; i++)
+        for(int i = 0; i < list.Count; i++)
         {
-            highScores[i].SetText(HighScores[i].score + " " + HighScores[i].playerName);
+            highScores[i].SetText(list[i]);
         }
     }
 }

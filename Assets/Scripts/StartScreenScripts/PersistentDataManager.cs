@@ -12,22 +12,37 @@ public class PersistentDataManager : MonoBehaviour
 
     public static PersistentDataManager Instance;
 
-    private string saveFilePath = Application.persistentDataPath + "/highscores.json";
+    private static HighScores highScores;
 
+    private static string saveFilePath;
     public static string CurrentPlayer;
+
     public static int CurrentScore;
+    public static int sessionHighScore = 0;
 
     public const int MAXHIGHSCORE = 5;
     public const int SCENEMENU = 0;
     public const int SCENEGAME = 1;
     public const int SCENEGAMEOVER = 2;
 
+    [System.Serializable]
+    public class HighScoreStruct
+    {
+        public string playerName;
+        public int score;
+    }
+
+    [System.Serializable]
+    public class HighScores
+    {
+        public List<HighScoreStruct> highScoresList;
+    }
+
     private void Awake()
     {
         /*
          * Make sure we are are a singleton
          * Tell Unity not to trash us on scene unload
-         * Load high scores from storage
          */
         if (Instance != null)
         {
@@ -37,18 +52,10 @@ public class PersistentDataManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        saveFilePath = Application.persistentDataPath + "/highscores.json";
     }
 
-    [System.Serializable]
-    public class HighScore
-    {
-        public string playerName;
-        public int score;
-    }
-
-    public static List<HighScore> HighScores = new List<HighScore>();
-
-    public void SaveHighScores()
+    public static void SaveHighScores()
     {
         int i;
 
@@ -65,50 +72,73 @@ public class PersistentDataManager : MonoBehaviour
          */
 
         // Create current player/score pair
-        HighScore highScore = new HighScore();
+        HighScoreStruct highScore = new HighScoreStruct();
         highScore.playerName = CurrentPlayer;
         highScore.score = CurrentScore;
 
         // If the list is empty, then add it as the only element.
-        if (HighScores.Count == 0)
+        if (highScores.highScoresList.Count == 0)
         {
-            HighScores.Add(highScore);
+            highScores.highScoresList.Add(highScore);
         }
         else
         // Otherwise, insert it where it goes
         {
-            for (i = 0; i < HighScores.Count; i++)
+            bool done = false;
+            i = 0;
+
+            while (!done && i < highScores.highScoresList.Count)
             {
-                if (highScore.score > HighScores[i].score)
+                if (CurrentScore > highScores.highScoresList[i].score)
                 {
-                    HighScores.Insert(i, highScore);
-                    break;
+                    highScores.highScoresList.Insert(i, highScore);
+                    done = true;
                 }
-            }
-            if (i >= MAXHIGHSCORE)
-            {
-                HighScores.Add(highScore);
+                i++;
             }
         }
 
         // Trim the list to the maximum size
-        if (HighScores.Count > MAXHIGHSCORE)
+        if (highScores.highScoresList.Count > MAXHIGHSCORE)
         {
-            HighScores.RemoveAt(MAXHIGHSCORE);
+            highScores.highScoresList.RemoveAt(MAXHIGHSCORE);
         }
 
         // Let's write that sucker out
-        string json = JsonUtility.ToJson(HighScores);
+        string json = JsonUtility.ToJson(highScores);
         File.WriteAllText(saveFilePath, json);
     }
 
-    public void LoadHighScores()
+    public static void LoadHighScores()
     {
+        highScores = new HighScores();
+        HighScoreStruct tmp = new HighScoreStruct();
+
+        highScores.highScoresList = new List<HighScoreStruct>();
 
         if (File.Exists(saveFilePath))
         {
             string json = File.ReadAllText(saveFilePath);
-            HighScores = JsonUtility.FromJson<List<HighScore>>(json);
+            highScores = JsonUtility.FromJson<HighScores>(json);
         }
+    }
+
+    public static List<string> GetFormattedHighScoresList()
+    {
+        List<string> list = new List<string>();
+
+        for (int i = 0; i < highScores.highScoresList.Count; i++)
+        {
+            list.Add(highScores.highScoresList[i].score + " " + 
+                highScores.highScoresList[i].playerName);
+        }
+
+        return list;
+    }
+
+    public static void SetScores(int score)
+    {
+        CurrentScore = score;
+        sessionHighScore = sessionHighScore < score ? score : sessionHighScore;
     }
 }

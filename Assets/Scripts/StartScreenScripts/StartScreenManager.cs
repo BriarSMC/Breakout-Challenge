@@ -12,19 +12,17 @@ public class StartScreenManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI errorMessage;          // SET IN EDITOR
     [SerializeField] TextMeshProUGUI playerName;            // SET IN EDITOR    
 
-
-
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-           
+        PersistentDataManager.LoadHighScores();
     }
 
     public void StartNewGame()
     {
-        string name = playerName.text.Trim();
+        string name = playerName.text.Trim((char)8203); // https://forum.unity.com/threads/textmesh-pro-ugui-hidden-characters.505493/
+        name = name.Trim();
 
-        if(name == null)
+        if(string.IsNullOrEmpty(name))
         {
             errorMessage.SetText("Please enter a player name");
             return;
@@ -32,7 +30,11 @@ public class StartScreenManager : MonoBehaviour
 
         PersistentDataManager.CurrentPlayer = name;
         PersistentDataManager.CurrentScore = 0;
+        PersistentDataManager.sessionHighScore = 0;
         errorMessage.SetText("");
+
+        PersistentDataManager.LoadHighScores();
+        SceneManager.LoadScene(PersistentDataManager.SCENEGAME, LoadSceneMode.Single);
     }
 
     public static void Exit()
@@ -43,4 +45,15 @@ public class StartScreenManager : MonoBehaviour
         Application.Quit();
 #endif
     }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scence, LoadSceneMode mode)
+    {
+        errorMessage.SetText("");           // Erase any text in the error message line
+    }
 }
+
